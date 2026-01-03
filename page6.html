@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-touch-callout" content="none">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100;300;400&display=swap">
+    <title>糊纸步骤</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
+        }
+
+        html, body {
+            overflow: hidden !important;
+            height: 100% !important;
+            touch-action: none !important;
+            -webkit-overflow-scrolling: auto !important;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            background-image: url("背景图/花纹背景.jpg");
+            background-size: cover;
+            background-position: center;
+            font-family: "Noto Sans SC", sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-repeat: no-repeat;
+            position: relative;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            -webkit-font-smoothing: antialiased;
+            transition: opacity 0.2s ease;
+            padding: 15px;
+        }
+
+        /* 音乐图标样式（完全同步扎制骨架） */
+        .music-icon {
+            position:absolute;
+            top:30px;
+            right:30px;
+            width:32px;
+            height:32px;
+            background-image:url("封面/资源 24@0.5x.webp");
+            background-size:100% 100%;
+            background-repeat:no-repeat;
+            background-position: center;
+            cursor:pointer;
+            z-index: 999;
+            transition: transform 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            padding: 8px;
+            margin: -8px;
+            will-change: transform;
+        }
+
+        .music-icon.active{
+            animation: rotateMusic 3s linear infinite;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+
+        @keyframes rotateMusic{
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* 步骤标签样式（完全同步扎制骨架） */
+        .step-tabs {
+            display:flex;
+            gap: 8vw;
+            margin: 5vh 0 2vh 0;
+            align-items: center;
+            flex-shrink: 0;
+            will-change: transform;
+        }
+
+        .step-tab.hu {
+            width:21vw;
+            height:21vw;
+            max-width: 120px;
+            max-height: 120px;
+            border-radius: 50%;
+            background: url("风筝制作/资源 31@0.5x.webp")no-repeat center;
+            background-size: contain;
+            cursor:pointer;
+            transition: all 0.2s ease-out;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .step-tab.za{
+            width:15vw;
+            height:15vw;
+            max-width: 80px;
+            max-height: 80px;
+            background: url("风筝制作/资源 29@0.5x.webp")no-repeat center;
+            background-size: contain;
+            cursor:pointer;
+            transition: all 0.2s ease-out;
+        }
+
+        .step-tab.hui{
+            width:15vw;
+            height:15vw;
+            max-width: 80px;
+            max-height: 80px;
+            border-radius: 50%;
+            background: url("风筝制作/资源 29@0.5x.webp")no-repeat center;
+            background-size: contain;
+            cursor:pointer;
+            transition: all 0.2s ease-out;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .step-tab.active{
+            background-color: transparent;
+        }
+
+        /* 拖拽目标区域（完全同步扎制骨架） */
+        .skeleton-container {
+            width:85%;
+            height: 38vh;
+            margin-bottom: 1vh;
+            display:flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            flex-shrink: 0;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .skeleton-container.drag-over {
+            border-color: #ff9900;
+            background-color: rgba(255, 153, 0, 0.2);
+        }
+
+        .skeleton-img {
+            width:100%;
+            height:100%;
+            object-fit: contain;
+            display:none;
+            position: absolute;
+            z-index: 10;
+            left:50%;
+            top:50%;
+            transform: translate(-50%,-50%);
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+            opacity: 1;
+            backface-visibility: hidden;
+        }
+
+        .skeleton-img.fade-out{
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.98);
+        }
+
+        /* 目标图片放大样式（同步扎制骨架） */
+        #finalSkeleton,
+        #paste-swallow, #paste-butterfly, #paste-fish,
+        #cloth-swallow, #cloth-butterfly, #cloth-fish,
+        #paper-swallow, #paper-butterfly, #paper-fish {
+            transform: translate(-50%, -50%) scale(1.1);
+            object-fit: cover;
+            object-position: center;
+        }
+
+        #finalSkeleton {
+            display: block;
+            transform: translate(-50%, -50%) scale(1.1);
+            object-fit: cover;
+            object-position: center;
+        }
+
+        /* 选项框核心修改：同步扎制骨架的拖拽版样式 */
+        .option-box {
+            width: 95%;
+            height: 28vw;
+            max-height: 160px;
+            background: url("风筝制作/资源 80@0.5x.webp");
+            background-size: 100% 100%;
+            display:flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2vw 4vw;
+            position: relative;
+            z-index: 20;
+            touch-action: manipulation;
+            margin-top: 2vh; /* 移除原9vh，同步扎制骨架的间距 */
+            margin-bottom: 3vh;
+            flex-shrink: 0;
+            overflow: visible; /* 确保提示文字不被裁剪 */
+        }
+
+        /* 核心修改：提示文字改为“依次拖动裱糊面料”，移入框内（同步扎制骨架） */
+        .option-box::before {
+            content: "依次拖动裱糊面料"; /* 修改提示文字 */
+            position:absolute;
+            top: 1vw; /* 移入框内顶部 */
+            left:50%;
+            transform: translateX(-50%);
+            font-size: clamp(12px, 4vw, 16px); /* 同步扎制骨架的字体大小 */
+            color: #000;
+            -webkit-font-smoothing: antialiased;
+            font-weight: 400;
+            white-space: nowrap;
+            z-index: 1;
+        }
+
+        /* 选项项核心修改：添加拖拽样式+小背景图（同步扎制骨架） */
+        .option-item {
+            display:flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: grab; /* 拖拽光标 */
+            opacity: 0.7;
+            transition: opacity 0.3s, transform 0.15s;
+            pointer-events: auto;
+            -webkit-tap-highlight-color: transparent;
+            padding: 8px;
+            margin: 0;
+            width: 18vw;
+            max-width: 80px;
+            flex-shrink: 0;
+            position: relative; /* 为伪元素定位 */
+            height: 18vw; /* 同步扎制骨架的高度 */
+            max-height: 90px;
+            draggable: true; /* 允许拖拽 */
+        }
+
+        /* 选项项小背景图（同步扎制骨架的伪元素样式） */
+        .option-item::before{
+            content: "";
+            position: absolute;
+            top: calc(50% - 5vw); 
+            left: 50%;
+            transform: translate(-50%, 0);
+            width: 28vw;
+            height: auto;
+            max-width: 100px;
+            max-height: none;
+            background-image: url("风筝制作/资源 20@0.5x.webp"); /* 小背景图 */
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 1;
+            aspect-ratio: 3 / 1;
+        }
+
+        /* 拖拽/点击状态样式 */
+        .option-item:active {
+            cursor: grabbing;
+        }
+
+        .option-item.used {
+            opacity: 0.3;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+        /* 选项图标样式（同步扎制骨架） */
+        .option-icon {
+            width:12vw;
+            height:12vw;
+            max-width: 60px;
+            max-height: 60px;
+            object-fit: contain;
+            backface-visibility: hidden;
+            display: block;
+            z-index: 2; /* 覆盖小背景图 */
+            position: relative;
+            transform: translateY(2vw); /* 调整图标位置 */
+            margin-bottom: 7vw;
+        }
+
+        /* 选项文字样式（同步扎制骨架） */
+        .option-text {
+            font-size: clamp(14px, 4vw, 18px);
+            color:#000;
+            font-weight: 300;
+            -webkit-font-smoothing: antialiased;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            z-index: 2; /* 覆盖小背景图 */
+            position: relative;
+            margin: 0;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* 按钮组样式（同步扎制骨架） */
+        .btn-group {
+            display:flex;
+            gap: 20vw;
+            z-index: 20;
+            flex-shrink: 0;
+        }
+
+        .page-btn {
+            padding: 2vw 5vw;
+            background: url("风筝制作/资源 89@0.5x.webp");
+            background-size: 100% 100%;
+            font-size: clamp(14px, 4vw, 18px);
+            color: #000;
+            cursor: pointer;
+            border:none;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            opacity: 0.5;
+            pointer-events: none;
+            will-change: opacity;
+            min-width: 90px;
+            height: 45px;
+        }
+
+        .page-btn.enable {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .page-btn.enable:active{
+            transform: scale(0.95);
+        }
+
+        /* 小屏适配（同步扎制骨架+拖拽版调整） */
+        @media screen and (max-width:375px){
+            .music-icon{
+                width:28px;
+                height:28px;
+                top:20px;
+                right:20px;
+            }
+            .option-box{
+                height: 32vw;
+                margin-top: 1vh;
+                margin-bottom: 2vh;
+                padding: 2vw 2vw;
+            }
+            /* 小屏提示文字位置微调 */
+            .option-box::before {
+                top: 2vw;
+            }
+            .option-item{
+                width: 17vw;
+                height: 20vw;
+            }
+            .option-item::before{
+                top: calc(50% - 5vw); 
+                width: 20vw;
+                max-width: 160px;
+                aspect-ratio: 3 / 1;
+            }
+            .option-icon{
+                width: 10vw;
+                height: 10vw;
+                transform: translateY(3vw);
+                margin-bottom: 5vw;
+            }
+            .option-text{
+                font-size: clamp(12px, 3.5vw, 16px);
+            }
+            .skeleton-container{
+                height: 35vh;
+            }
+            .btn-group{
+                gap: 15vw;
+            }
+            /* 目标图片放大值保持1.1 */
+            #paste-swallow, #paste-butterfly, #paste-fish,
+            #cloth-swallow, #cloth-butterfly, #cloth-fish,
+            #paper-swallow, #paper-butterfly, #paper-fish,
+            #finalSkeleton {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+        }
+
+        /* 大屏适配（同步扎制骨架+拖拽版调整） */
+        @media screen and (min-width:768px){
+            .step-tabs{
+                gap: 50px;
+            }
+            .option-box{
+                max-height: 180px;
+                padding: 2vw 5vw;
+                margin-top: 1vh;
+            }
+            /* 大屏提示文字位置微调 */
+            .option-box::before {
+                top: 10px;
+            }
+            .option-item{
+                width: 15vw;
+                max-width: 90px;
+                height: 15vw;
+                max-height: 100px;
+            }
+            .option-item::before{
+                top: calc(50% - 3vw); 
+                width: 25vw;
+                max-width: 160px;
+                aspect-ratio: 3 / 1;
+            }
+            .option-icon{
+                max-width: 70px;
+                max-height: 70px;
+                transform: translateY(3vw);
+                margin-bottom: 5vw;
+            }
+            .option-text{
+                font-size: clamp(16px, 2vw, 20px);
+            }
+            .btn-group{
+                gap: 120px;
+            }
+            .page-btn{
+                min-width: 100px;
+                height: 50px;
+            }
+            .skeleton-container{
+                height: 45vh;
+            }
+            /* 大屏目标图片放大值改为1.35 */
+            #paste-swallow, #paste-butterfly, #paste-fish,
+            #cloth-swallow, #cloth-butterfly, #cloth-fish,
+            #paper-swallow, #paper-butterfly, #paper-fish,
+            #finalSkeleton {
+                transform: translate(-50%, -50%) scale(1.35);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 核心修改1：音频标签属性完全对齐前两页 -->
+    <audio id="bgMusic" loop preload="metadata" autoplay playsinline>
+        <source src="music.m4a" type="audio/mp4">
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+    <div class="music-icon" id="musicIcon"></div>
+
+    <div class="step-tabs">
+        <div class="step-tab za"></div>
+        <div class="step-tab hu active"></div>
+        <div class="step-tab hui"></div>
+    </div>
+
+    <!-- 拖拽目标区域 -->
+    <div class="skeleton-container" id="dropTarget">
+        <img src="骨架/骨架/IMG_2713.PNG" alt="燕子骨架" class="skeleton-img" id="finalSkeleton">
+        <img src="风筝制作/步骤图/燕 浆糊.PNG" alt="燕子浆糊" class="skeleton-img" id="paste-swallow">
+        <img src="风筝制作/步骤图/蝶 浆糊.PNG" alt="蝴蝶浆糊" class="skeleton-img" id="paste-butterfly">
+        <img src="风筝制作/步骤图/鱼 浆糊.PNG" alt="鱼浆糊" class="skeleton-img" id="paste-fish">
+        <img src="风筝制作/步骤图/燕 纱布.PNG" alt="燕子纱布" class="skeleton-img" id="cloth-swallow">
+        <img src="风筝制作/步骤图/蝶 纱布.PNG" alt="蝴蝶纱布" class="skeleton-img" id="cloth-butterfly">
+        <img src="风筝制作/步骤图/鱼 纱布.PNG" alt="鱼纱布" class="skeleton-img" id="cloth-fish">
+        <img src="风筝制作/步骤图/燕 宣纸.PNG" alt="燕子宣纸" class="skeleton-img" id="paper-swallow">
+        <img src="风筝制作/步骤图/蝶 宣纸.PNG" alt="蝴蝶宣纸" class="skeleton-img" id="paper-butterfly">
+        <img src="风筝制作/步骤图/鱼 宣纸.PNG" alt="鱼宣纸" class="skeleton-img" id="paper-fish">
+    </div>
+
+    <div class="option-box">
+        <div class="option-item" data-step="1" data-type="paste">
+            <img src="风筝制作/资源 39@0.5x.webp" alt="浆糊图标" class="option-icon">
+            <span class="option-text">浆糊</span>
+        </div>
+        <div class="option-item" data-step="2" data-type="cloth">
+            <img src="风筝制作/资源 40@0.5x.webp" alt="纱布图标" class="option-icon">
+            <span class="option-text">纱布</span>
+        </div>
+        <div class="option-item" data-step="3" data-type="paper">
+            <img src="风筝制作/资源 38@0.5x.webp" alt="宣纸图标" class="option-icon">
+            <span class="option-text">宣纸</span>
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button class="page-btn enable" id="prevBtn">上一步</button>
+        <button class="page-btn" id="nextBtn" disabled>下一步</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 基础变量
+            const urlParams = new URLSearchParams(window.location.search);
+            const kiteType = urlParams.get('type') || 'swallow';
+            const totalSteps = 3; // 糊纸步骤总数
+            const clickedSteps = new Set();
+
+            // DOM元素
+            const optionItems = document.querySelectorAll('.option-item');
+            const skeletonImgs = document.querySelectorAll('.skeleton-img');
+            const prevBtn = document.getElementById("prevBtn");
+            const nextBtn = document.getElementById("nextBtn");
+            const musicIcon = document.getElementById("musicIcon");
+            const bgMusic = document.getElementById("bgMusic");
+            const finalSkeleton = document.getElementById('finalSkeleton');
+            const dropTarget = document.getElementById('dropTarget'); // 拖拽目标区域
+            let draggedItem = null; // 记录当前拖拽元素
+
+            // ===================== 核心修改：音乐逻辑完全对齐前两页 =====================
+            // 音乐状态变量（统一命名和存储规则）
+            let isMusicPlaying = localStorage.getItem('musicPlaying') === 'true' || false;
+            const savedTime = parseFloat(localStorage.getItem('musicTime') || 0);
+            let progressTimer = null;
+            
+            // 初始化交互标记（和前两页统一）
+            if (!localStorage.getItem('musicHasInteraction')) {
+                localStorage.setItem('musicHasInteraction', 'false');
+            }
+            const hasInteraction = localStorage.getItem('musicHasInteraction') === 'true';
+
+            /**
+             * 保存音乐状态到本地存储（和前两页完全一致）
+             */
+            function saveMusicState() {
+                localStorage.setItem('musicPlaying', isMusicPlaying ? 'true' : 'false');
+                localStorage.setItem('musicTime', bgMusic.currentTime.toString());
+                localStorage.setItem('musicHasInteraction', 'true');
+            }
+
+            /**
+             * 启动音乐进度定时器，实时保存播放位置（100ms间隔）
+             */
+            function startProgressTimer() {
+                if (progressTimer) clearInterval(progressTimer);
+                progressTimer = setInterval(() => {
+                    if (bgMusic.currentTime > 0 && !bgMusic.paused) {
+                        saveMusicState();
+                    }
+                }, 100);
+            }
+
+            /**
+             * 初始化音频播放（静音兜底+恢复进度，和前两页完全一致）
+             */
+            function initAudio() {
+                // 恢复播放进度
+                if (!isNaN(savedTime) && savedTime > 0 && savedTime < (bgMusic.duration || 10000)) {
+                    bgMusic.currentTime = savedTime;
+                    console.log("糊纸步骤页恢复音乐进度：", savedTime);
+                }
+                
+                // 强制保持播放状态
+                if (!isMusicPlaying) {
+                    isMusicPlaying = true;
+                }
+                musicIcon.classList.add('active');
+                
+                // 静音兜底：绕过浏览器自动播放限制
+                bgMusic.muted = true;
+                bgMusic.play().then(() => {
+                    bgMusic.muted = false;
+                    console.log("糊纸步骤页音频强制激活成功");
+                }).catch(err => {
+                    console.log("糊纸步骤页音频激活兜底:", err);
+                    // 重试逻辑
+                    setTimeout(() => {
+                        bgMusic.play();
+                    }, 100);
+                });
+
+                startProgressTimer();
+                localStorage.setItem('musicHasInteraction', 'true');
+            }
+
+            /**
+             * 切换音乐播放/暂停（拦截事件，和前两页一致）
+             */
+            function toggleMusic(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                
+                try {
+                    if (isMusicPlaying) {
+                        bgMusic.pause();
+                        musicIcon.classList.remove('active');
+                    } else {
+                        bgMusic.play();
+                        musicIcon.classList.add('active');
+                        localStorage.setItem('musicHasInteraction', 'true');
+                    }
+                    isMusicPlaying = !isMusicPlaying;
+                    saveMusicState();
+                } catch (err) {
+                    console.error("音乐切换失败：", err);
+                    alert("音频播放失败，请检查文件路径");
+                }
+            }
+
+            // ===================== 拖拽交互逻辑（保留原有功能） =====================
+            // 1. 监听拖拽开始
+            optionItems.forEach(item => {
+                item.addEventListener('dragstart', function(e) {
+                    if (this.classList.contains('used')) {
+                        e.preventDefault();
+                        return;
+                    }
+                    draggedItem = this;
+                    e.dataTransfer.setData('text/plain', this.dataset.step);
+                    e.dataTransfer.effectAllowed = 'move';
+                    this.style.opacity = '0.5';
+                });
+
+                // 拖拽结束
+                item.addEventListener('dragend', function() {
+                    this.style.opacity = '1';
+                    dropTarget.classList.remove('drag-over');
+                });
+            });
+
+            // 2. 拖拽目标区域事件
+            dropTarget.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                this.classList.add('drag-over');
+            });
+
+            dropTarget.addEventListener('dragleave', function() {
+                this.classList.remove('drag-over');
+            });
+
+            // 3. 处理放置事件（核心业务逻辑）
+            dropTarget.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('drag-over');
+                
+                if (!draggedItem) return;
+                handleDragDrop(draggedItem);
+            });
+
+            // ===================== 移动端触摸模拟拖拽（保留原有功能） =====================
+            let touchStartX, touchStartY;
+            let isDragging = false;
+            let touchDraggedItem = null;
+
+            optionItems.forEach(item => {
+                item.addEventListener('touchstart', function(e) {
+                    if (this.classList.contains('used')) return;
+                    
+                    touchStartX = e.touches[0].clientX;
+                    touchStartY = e.touches[0].clientY;
+                    touchDraggedItem = this;
+                    isDragging = false;
+                    e.preventDefault();
+                });
+
+                item.addEventListener('touchmove', function(e) {
+                    if (!touchDraggedItem) return;
+                    
+                    const dx = e.touches[0].clientX - touchStartX;
+                    const dy = e.touches[0].clientY - touchStartY;
+                    
+                    if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+                        isDragging = true;
+                        touchDraggedItem.style.opacity = '0.5';
+                    }
+                });
+
+                item.addEventListener('touchend', function(e) {
+                    if (!touchDraggedItem || !isDragging) {
+                        touchDraggedItem = null;
+                        isDragging = false;
+                        return;
+                    }
+                    
+                    const touchEndX = e.changedTouches[0].clientX;
+                    const touchEndY = e.changedTouches[0].clientY;
+                    
+                    // 判断是否拖到目标区域
+                    const targetRect = dropTarget.getBoundingClientRect();
+                    if (
+                        touchEndX >= targetRect.left &&
+                        touchEndX <= targetRect.right &&
+                        touchEndY >= targetRect.top &&
+                        touchEndY <= targetRect.bottom
+                    ) {
+                        handleDragDrop(touchDraggedItem);
+                    }
+                    
+                    // 恢复样式
+                    touchDraggedItem.style.opacity = '1';
+                    touchDraggedItem = null;
+                    isDragging = false;
+                });
+            });
+
+            // ===================== 核心业务逻辑（保留原有功能） =====================
+            function handleDragDrop(item) {
+                const currentStep = parseInt(item.getAttribute('data-step'));
+
+                if (isNaN(currentStep) || currentStep < 1 || currentStep > totalSteps) {
+                    return;
+                }
+
+                clickedSteps.add(currentStep);
+                skeletonImgs.forEach(img => img.classList.add('fade-out'));
+
+                setTimeout(() => {
+                    skeletonImgs.forEach(img => {
+                        img.style.display = 'none';
+                        img.classList.remove('fade-out');
+                    });
+
+                    const optionType = item.getAttribute('data-type');
+                    const targetImgId = `${optionType}-${kiteType}`;
+                    
+                    const targetImg = document.getElementById(targetImgId);
+                    if (targetImg) {
+                        targetImg.style.display = 'block';
+                        targetImg.style.opacity = 1;
+                        // 放大效果过渡动画
+                        targetImg.style.transform = `translate(-50%, -50%) scale(1)`;
+                        setTimeout(() => {
+                            targetImg.style.transform = `translate(-50%, -50%) scale(1.1)`;
+                        }, 50);
+                    } else {
+                        console.warn(`未找到对应糊纸图: ${targetImgId}`);
+                    }
+
+                    // 标记为已使用
+                    item.classList.add('used');
+
+                    // 启用下一步选项
+                    const nextStep = currentStep + 1;
+                    const nextItem = Array.from(optionItems).find(el => parseInt(el.dataset.step) === nextStep);
+                    if (nextItem) {
+                        nextItem.classList.remove('used');
+                    }
+
+                    // 最后一步解锁下一步
+                    if (currentStep === totalSteps) {
+                        nextBtn.disabled = false;
+                        nextBtn.classList.add('enable');
+                    }
+                }, 200);
+            }
+
+            // ===================== 上一步/下一步逻辑（增加音乐状态保存） =====================
+            function handlePrevClick(e) {
+                e.stopPropagation();
+                if (e.type === 'touchstart') e.preventDefault();
+                // 核心修改：页面切换前保存音乐状态
+                saveMusicState();
+                document.body.style.opacity = 0;
+                setTimeout(() => {
+                    window.location.href = `page5.html?type=${kiteType}`;
+                }, 200);
+            }
+
+            function handleNextClick(e) {
+                e.stopPropagation();
+                if (e.type === 'touchstart') e.preventDefault();
+                // 核心修改：页面切换前保存音乐状态
+                saveMusicState();
+                if (clickedSteps.has(totalSteps)) {
+                    document.body.style.opacity = 0;
+                    setTimeout(() => {
+                        window.location.href = `page7.html?type=${kiteType}`;
+                    }, 200);
+                }
+            }
+
+            // ===================== 初始化与辅助功能 =====================
+            // 图片预加载
+            const preloadImages = () => {
+                skeletonImgs.forEach(img => {
+                    const preloadImg = new Image();
+                    preloadImg.src = img.src;
+                    preloadImg.onerror = () => console.warn(`图片预加载失败: ${img.src}`);
+                });
+                document.querySelectorAll('.option-icon').forEach(icon => {
+                    const preloadImg = new Image();
+                    preloadImg.src = icon.src;
+                    preloadImg.onerror = () => console.warn(`图标预加载失败: ${icon.src}`);
+                });
+                // 预加载小背景图
+                const bgImg = new Image();
+                bgImg.src = "风筝制作/资源 20@0.5x.webp";
+                bgImg.onerror = () => console.warn(`小背景图预加载失败: 风筝制作/资源 20@0.5x.webp`);
+            };
+            setTimeout(preloadImages, 300);
+
+            // 替换初始骨架图
+            function replaceFinalSkeleton() {
+                const skeletonSrcMap = {
+                    swallow: "骨架/骨架/IMG_2713.PNG",
+                    butterfly: "骨架/骨架/IMG_2721.PNG",
+                    fish: "骨架/骨架/IMG_2717.PNG",
+                };
+                finalSkeleton.src = skeletonSrcMap[kiteType] || skeletonSrcMap.swallow;
+            }
+            replaceFinalSkeleton();
+
+            // 初始化选项状态
+            optionItems[0].classList.remove('used'); // 第一个选项可用
+            prevBtn.classList.add('enable');
+            nextBtn.disabled = true;
+            
+            // 绑定按钮事件
+            prevBtn.addEventListener('touchstart', handlePrevClick, { passive: false });
+            prevBtn.addEventListener('click', handlePrevClick);
+            nextBtn.addEventListener('touchstart', handleNextClick, { passive: false });
+            nextBtn.addEventListener('click', handleNextClick);
+
+            // 核心修改：音乐按钮事件绑定（和前两页一致）
+            musicIcon.addEventListener('touchstart', toggleMusic, { passive: false });
+            musicIcon.addEventListener('click', toggleMusic);
+            
+            // 核心修改：全局一次性交互监听，任意触摸/点击激活音频（和前两页一致）
+            document.addEventListener('touchstart', () => {
+                initAudio();
+            }, { once: true });
+            document.addEventListener('click', () => {
+                initAudio();
+            }, { once: true });
+
+            // 核心修改：页面可见性变化处理（和前两页一致）
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden && isMusicPlaying) {
+                    bgMusic.pause();
+                    isMusicPlaying = false;
+                    musicIcon.classList.remove('active');
+                    saveMusicState();
+                } else if (!document.hidden && localStorage.getItem('musicPlaying') === 'true') {
+                    // 切回前台时带静音兜底续播
+                    bgMusic.muted = true;
+                    bgMusic.play().then(() => {
+                        bgMusic.muted = false;
+                        isMusicPlaying = true;
+                        musicIcon.classList.add('active');
+                    }).catch(err => console.log("糊纸步骤页切回前台续播失败：", err));
+                }
+            });
+
+            // 核心修改：页面卸载前保存状态（和前两页一致）
+            window.addEventListener('beforeunload', () => {
+                saveMusicState();
+                clearInterval(progressTimer);
+                bgMusic.pause();
+            });
+
+            // 图片加载错误处理
+            skeletonImgs.forEach(img => {
+                img.onerror = function() {
+                    this.style.display = 'none';
+                    console.error(`图片加载失败: ${this.src}`);
+                };
+            });
+
+            document.querySelectorAll('.option-icon').forEach(icon => {
+                icon.onerror = function() {
+                    this.style.opacity = 0.5;
+                    console.error(`图标加载失败: ${this.src}`);
+                };
+            });
+
+            // 禁止拖拽/选中等默认行为
+            document.addEventListener('dragstart', (e) => e.preventDefault());
+            document.addEventListener('selectstart', (e) => e.preventDefault());
+
+            // 禁止滑动
+            document.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }, { passive: false });
+
+            document.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }, { passive: false });
+
+            // 页面加载完成后恢复音乐状态（和前两页一致）
+            window.addEventListener('load', () => {
+                if (bgMusic.readyState >= 2 && hasInteraction) {
+                    initAudio();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

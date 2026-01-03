@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-touch-callout" content="none">
+    <title>制作风筝</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100;300;400&display=swap">
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
+        }
+
+        html, body {
+            overflow: hidden !important;
+            height: 100% !important;
+            touch-action: none !important;
+            -webkit-overflow-scrolling: auto !important;
+        }
+
+        body{
+            overflow: hidden;
+            width:100vw;
+            height: 100vh;
+            background-image:url("背景图/花纹背景.jpg");
+            background-size:cover;
+            background-position:center;
+            font-family:"Noto Sans SC",sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-repeat: no-repeat;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            -webkit-font-smoothing: antialiased;
+            padding: 15px 15px;
+        }
+
+        .title-box{
+            width:90%;
+            max-width: 300px;
+            height:50px;
+            background: url("风筝制作/资源\ 78@0.5x.webp");
+            background-size: 100% 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 50px 0 20px 0;
+            flex-shrink: 0;
+            will-change: transform;
+        }
+        
+        .title-text{
+            font-size: 18pt;
+            color:#333;
+            font-weight: 300;
+        }
+
+        .skeleton-container{
+            width:90%;
+            height:40vh;
+            margin-bottom: 10px;
+            justify-content: center;
+            display: flex;
+            position: relative;
+            margin: 20px 0 25px 0;
+            flex-shrink: 0;
+        }
+
+        /* ========== 核心修改：统一缩放样式，消除跳动 ========== */
+        .skeleton-img{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            /* 1. 初始缩放设为1（和JS加载后一致），若想要放大则统一设为1.2 */
+            transform: scale(1); 
+            /* 新增：固定缩放原点，避免偏移 */
+            transform-origin: center center;
+            display:block;
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+            opacity: 1;
+            backface-visibility: hidden;
+            will-change: opacity, src;
+        }
+
+        .options{
+            display: flex;
+            justify-content: space-around;
+            gap: 8px;
+            width:95%;
+            max-width: 550px;
+            height: 140px;
+            background: url("风筝制作/资源\ 77@0.5x.webp")no-repeat center;
+            background-size: 100% 100%;
+            align-items: center;
+            touch-action: manipulation;
+            /* ========== 核心修改1：增加margin-top实现整体下移 ========== */
+            /* 原样式：margin: 0 0 30px 0; */
+            margin: 50px 0 30px 0; /* 把margin-top从0改成50px，可根据需要调整数值 */
+            flex-shrink: 0;
+        }
+
+        .option-item{
+            width: 80px;
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s ease-out, filter 0.2s ease-out;
+            -webkit-tap-highlight-color: transparent;
+            padding: 5px;
+        }
+
+        .option-item.active{
+            transform: scale(1.08);
+            filter:brightness(1.2);
+        }
+
+        .option-icon{
+            width: 45px;
+            height: 45px;
+            margin-bottom: 10px;
+            backface-visibility: hidden;
+        }
+
+        .option-text{
+            font-size: 14pt;
+            color:#333;
+            font-weight: 100;
+        }
+
+        .btn-group{
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            width: 100%;
+            margin: 0 auto;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .next-btn{
+            width: 100px;
+            height: 45px;
+            background: url("风筝制作/资源\ 78@0.5x.webp");
+            background-size: 100% 100%;
+            border: none;
+            font-size: clamp(14pt, 3vw, 16pt);
+            color: #333;
+            font-weight: 300;
+            cursor:pointer;
+            opacity: 0.5;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+            will-change: opacity;
+        }
+
+        .next-btn.enable{
+            opacity:1;
+            pointer-events: all;
+        }
+
+        .next-btn.enable:active{
+            transform: scale(0.95);
+        }
+
+        .music-icon{
+            position:absolute;
+            top:30px;
+            right:30px;
+            width:32px;
+            height:32px;
+            background-image:url("封面/资源\ 24@0.5x.webp");
+            background-size:100% 100%;
+            background-repeat:no-repeat;
+            background-position: center;
+            cursor:pointer;
+            z-index: 999;
+            transition: transform 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            padding: 8px;
+            margin: -8px;
+        }
+
+        .music-icon.active{
+            animation: rotateMusic 3s linear infinite;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+
+        @keyframes rotateMusic{
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @media screen and (min-width:768px){
+            .title-box{
+                height:65px;
+                max-width:350px;
+                margin-bottom: 30px;
+            }
+            .skeleton-container{
+                height: 48vh;
+                max-width:750px;
+            }
+            .options{
+                height:160px;
+                max-width:600px;
+                /* ========== 核心修改2：大屏下同步调整margin-top ========== */
+                margin: 60px 0 35px 0; /* 对应大屏布局，下移60px，可按需调整 */
+            }
+            .option-item{
+                width:110px;
+                height:150px;
+            }
+            .option-icon{
+                width:60px;
+                height:60px;
+            }
+            .btn-group{
+                gap:30px;
+                width:90%;
+                max-width:600px;
+            }
+            .next-btn{
+                width: 120px;
+                height:45px;
+            }
+            .music-icon{
+                width:40px;
+                height:40px;
+                top:30px;
+                right:30px;
+            }
+        }
+
+        @media screen and (max-width:375px){
+            .title-box{
+                height:45px;
+                margin-bottom:15px;
+            }
+            .skeleton-container{
+                height: 38vh;
+                margin-bottom:20px;
+            }
+            .options{
+                height:100px;
+                /* ========== 核心修改3：小屏下同步调整margin-top ========== */
+                margin: 40px 0 25px 0; /* 对应小屏布局，下移40px，可按需调整 */
+                gap:5px;
+            }
+            .option-item{
+                width:70px;
+                height:100px;
+            }
+            .option-icon{
+                width:38px;
+                height:38px;
+            }
+            .next-btn{
+                width:80px;
+                height:30px;
+            }
+            .music-icon{
+                top:20px;
+                right:20px;
+                width:28px;
+                height:28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <audio id="bgMusic" loop preload="metadata" autoplay playsinline>
+        <source src="music.m4a" type="audio/mp4">
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+    <div class="music-icon" id="musicIcon"></div>
+    <div class ="title-box">
+        <span class ="title-text">选择骨架形状</span>
+    </div>
+    <div class="skeleton-container">
+        <img src="骨架/骨架/IMG_2714.PNG" alt="燕子骨架" class="skeleton-img" id="skeletonImg">
+    </div>
+    <div class="options">
+        <div class="option-item"  data-type="swallow" data-skeleton="骨架/骨架/IMG_2714.PNG" data-icon="风筝制作/资源\ 73@0.5x.webp">
+            <img src="风筝制作/资源 73@0.5x.webp" alt="燕" class="option-icon">
+            <span class="option-text">燕</span>
+        </div>
+        <div class="option-item" data-type="butterfly" data-skeleton="骨架/骨架/IMG_2722.PNG" data-icon="风筝制作/资源 74@0.5x.webp">
+            <img src="风筝制作/资源 74@0.5x.webp" alt="蝶" class="option-icon">
+            <span class="option-text">蝶</span>
+        </div>
+        <div class="option-item" data-type="fish" data-skeleton="骨架/骨架/IMG_2718.PNG" data-icon="风筝制作/资源 75@0.5x.webp">
+            <img src="风筝制作/资源 75@0.5x.webp" alt="鱼" class="option-icon">
+            <span class="option-text">鱼</span>
+        </div>
+    </div>
+    <div class="btn-group">
+        <button class="next-btn" id="nextBtn">下一步</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const optionItems = document.querySelectorAll('.option-item');
+            const skeletonImg = document.getElementById('skeletonImg');
+            const nextBtn = document.getElementById('nextBtn');
+            const musicIcon = document.getElementById('musicIcon');
+            const bgMusic = document.getElementById('bgMusic');
+            
+            let selectedType='';
+            let isMusicPlaying = localStorage.getItem('musicPlaying') === 'true' || false;
+            const savedTime = parseFloat(localStorage.getItem('musicTime') || 0);
+            if (!localStorage.getItem('musicHasInteraction')) {
+                localStorage.setItem('musicHasInteraction', 'false');
+            }
+            const hasInteraction = localStorage.getItem('musicHasInteraction') === 'true';
+            let progressTimer = null;
+
+            document.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }, { passive: false });
+            document.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }, { passive: false });
+
+            const preloadImages = () => {
+                optionItems.forEach(item => {
+                    const src = item.getAttribute('data-skeleton');
+                    const iconSrc = item.getAttribute('data-icon');
+                    [src, iconSrc].forEach(url => {
+                        const img = new Image();
+                        img.src = url;
+                    });
+                });
+            };
+            setTimeout(preloadImages, 300);
+
+            function handleOptionClick(e) {
+                e.stopPropagation();
+                if (e.type === 'touchstart') e.preventDefault();
+
+                const item = this;
+                optionItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+
+                skeletonImg.style.opacity = 0;
+                skeletonImg.style.transform = 'scale(0.98)';
+                
+                const skeletonSrc = item.getAttribute('data-skeleton');
+                if (skeletonImg.src !== skeletonSrc) {
+                    skeletonImg.onload = function() {
+                        skeletonImg.style.opacity = 1;
+                        // 2. 加载完成后恢复的缩放值和初始CSS一致（1倍）
+                        skeletonImg.style.transform = 'scale(1)';
+                    }
+                    skeletonImg.src = skeletonSrc;
+                } else {
+                    skeletonImg.style.opacity = 1;
+                    skeletonImg.style.transform = 'scale(1)';
+                }
+
+                selectedType = item.getAttribute('data-type');
+                nextBtn.classList.add('enable');
+            }
+
+            optionItems.forEach(item => {
+                item.addEventListener('touchstart', handleOptionClick, { passive: true });
+                item.addEventListener('click', handleOptionClick);
+            });
+
+            function handleNextClick(e) {
+                e.stopPropagation();
+                if (selectedType) {
+                    saveMusicState();
+                    setTimeout(() => {
+                        window.location.href = `page5.html?type=${selectedType}`;
+                    }, 80);
+                }
+            }
+            nextBtn.addEventListener('touchstart', handleNextClick, { passive: true });
+            nextBtn.addEventListener('click', handleNextClick);
+
+            function saveMusicState() {
+                localStorage.setItem('musicPlaying', isMusicPlaying ? 'true' : 'false');
+                localStorage.setItem('musicTime', bgMusic.currentTime.toString());
+                localStorage.setItem('musicHasInteraction', 'true');
+            }
+
+            function startProgressTimer() {
+                if (progressTimer) clearInterval(progressTimer);
+                progressTimer = setInterval(() => {
+                    if (bgMusic.currentTime > 0 && !bgMusic.paused) {
+                        saveMusicState();
+                    }
+                }, 100);
+            }
+
+            function initAudio() {
+                if (!isNaN(savedTime) && savedTime > 0) {
+                    bgMusic.currentTime = savedTime;
+                }
+                
+                if (!isMusicPlaying) {
+                    isMusicPlaying = true;
+                }
+                musicIcon.classList.add('active');
+                
+                bgMusic.muted = true;
+                bgMusic.play().then(() => {
+                    bgMusic.muted = false;
+                    console.log("page4音频强制激活成功");
+                }).catch(err => {
+                    console.log("page4音频激活兜底:", err);
+                    setTimeout(() => {
+                        bgMusic.play();
+                    }, 100);
+                });
+
+                startProgressTimer();
+                localStorage.setItem('musicHasInteraction', 'true');
+            }
+
+            document.addEventListener('touchstart', () => {
+                initAudio();
+            }, { once: true });
+            document.addEventListener('click', () => {
+                initAudio();
+            }, { once: true });
+
+            function handleMusicClick(e) {
+                e.stopPropagation();
+                e.preventDefault();
+
+                try {
+                    if (isMusicPlaying) {
+                        bgMusic.pause();
+                        musicIcon.classList.remove('active');
+                    } else {
+                        bgMusic.play();
+                        musicIcon.classList.add('active');
+                    }
+                    isMusicPlaying = !isMusicPlaying;
+                    saveMusicState();
+                } catch (e) {
+                    console.log('音乐控制异常:', e);
+                }
+            }
+            musicIcon.addEventListener('touchstart', handleMusicClick, { passive: false });
+            musicIcon.addEventListener('click', handleMusicClick);
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden && isMusicPlaying) {
+                    bgMusic.pause();
+                    isMusicPlaying = false;
+                    musicIcon.classList.remove('active');
+                    saveMusicState();
+                }
+            });
+            window.addEventListener('beforeunload', function() {
+                saveMusicState();
+                clearInterval(progressTimer);
+                bgMusic.pause();
+            });
+
+            skeletonImg.onerror = function() {
+                this.style.opacity = 1;
+                this.style.transform = 'scale(1)';
+                console.error('骨架图片加载失败:', this.src);
+            }
+            document.querySelectorAll('.option-icon').forEach(icon => {
+                icon.onerror = function() {
+                    this.style.opacity = 0.8;
+                    console.error('选项图标加载失败:', this.src);
+                }
+            });
+
+            window.addEventListener('load', () => {
+                if (bgMusic.readyState >= 2) {
+                    if (hasInteraction) {
+                        initAudio();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

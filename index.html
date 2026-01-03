@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>鸢缘 - 风筝首页</title>
+    <style>
+        /* 原有样式完全保留，无修改 */
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,body{
+            overflow:hidden !important;
+            height: 100% !important;
+            touch-action: none !important;
+            -webkit-overflow-scrolling: auto !important; 
+        }
+
+        .page-home{
+            width:100vw;
+            height:100vh;
+            background-image:url("背景图/背景图.jpg");
+            background-size:cover;
+            background-position:center;
+            position:relative;
+            overflow: hidden !important;
+            background-repeat: no-repeat;
+        }
+
+        .bg-circle{
+            position:absolute;
+            top:10vw;
+            right:5vw;
+            width:70vw;
+            height:70vw;
+            max-width: 500px;
+            max-height: 500px;
+            background-image:url("封面/资源\ 8@0.5x.webp");
+            background-size:contain;
+            background-repeat:no-repeat;
+            background-position: center right;
+            z-index:1;
+        }
+
+        .line-1{
+            position:absolute;
+            top:50vh;
+            left:0;
+            width:80vw;
+            max-width:500px;
+            min-width: 280px;
+            height:100px;
+            background-image: url("封面/资源\ 14@0.5x.webp");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: left center;
+            z-index: 1.5;
+        }
+
+        .line-2{
+            position:absolute;
+            bottom:25vh;
+            right:0;
+            width:40vw;
+            max-width: 300px;
+            height:100px;
+            background-image: url("封面/资源\ 3@0.5x.webp");
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 1.5;
+        }
+
+        .line-3{
+            position:absolute;
+            bottom:10vh;
+            left:0;
+            width:40vw;
+            max-width:300px;
+            min-width:200px;
+            height:100px;
+            background-image: url("封面/资源\ 4@0.5x.webp");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: left center;
+            z-index: 1.5;
+        }
+
+        .line-4{
+            position: absolute;
+            top:43vh;
+            right:0;
+            width:40vw;
+            max-width: 300px;
+            height:100px;
+            background-image: url("封面/资源\ 15@0.5x.webp");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: right center;
+            z-index: 2;
+        }
+
+        .kite-img{
+            width:65vw;
+            max-width: 600px;
+            position:absolute;
+            top:15vh;
+            left:0 !important; 
+            transform: translateX(0); 
+            height:auto;
+            z-index:2;
+            animation:float 6s ease-in-out infinite;
+            object-fit: contain; 
+        }
+
+        .text-area{
+            position:absolute;
+            right:8vw;
+            top:13vh;
+            z-index:3;
+        }
+
+        .text-area .text-img{
+            width:20vw;
+            max-width:100px;
+            min-width:50px;
+        }
+
+        .main-title{
+            position:absolute;
+            right:5vw;
+            bottom:10vh;
+            z-index: 3;
+        }
+
+        .yuan-with-pattern{
+            width:45vw;
+            max-width:240px;
+            min-width:160px;
+        }
+
+        .feiyi-tag{
+            position:absolute;
+            right:0;
+            top:20px;
+            width:12vw;
+            max-width:28px;
+            min-width:20px;
+            height:auto;
+            background-image:url("封面/资源\ 5@0.5x.webp");
+            background-size:contain;
+            background-repeat:no-repeat;
+            transform:rotate(10deg);
+            z-index:4;
+        }
+
+        .slide-tip{
+            position:absolute;
+            bottom:6vh;
+            left:50%;
+            transform:translateX(-50%);
+            z-index: 3;
+            width: 100%;
+            text-align: center;
+        }
+
+        .slide-tip-img{
+            width:18vw;
+            max-width:90px;
+            min-width:60px;
+            animation:bounce 1.5s infinite;
+            display: inline-block;
+            margin: 0 auto;
+        }
+
+        .music-icon{
+            position:absolute;
+            top:30px;
+            right:30px;
+            width:32px;
+            height:32px;
+            background-image:url("封面/资源\ 24@0.5x.webp");
+            background-size:100% 100%;
+            background-repeat:no-repeat;
+            background-position: center;
+            cursor:pointer;
+            z-index: 999;
+            transition: transform 0.2s ease;
+        }
+
+        .music-icon.active{
+            transform: rotate(360deg);
+            animation: rotateMusic 3s linear infinite;
+        }
+
+        @keyframes float{
+            0%{transform: translateY(0px) rotate(0deg);}
+            25%{transform: translateY(-8px) rotate(1deg);}
+            50%{transform: translateY(-10px) rotate(2deg);}
+            75%{transform: translateY(-8px) rotate(1deg);}
+            100%{transform: translateY(0px) rotate(0deg);}
+        }
+
+        @keyframes bounce{
+            0%,100%{transform: translateY(0);}
+            50%{transform: translateY(-8px);}
+        }
+
+        @keyframes rotateMusic{
+            from{transform: rotate(0deg);}
+            to{transform: rotate(360deg);}
+        }
+
+        @media screen and (max-width: 375px) {
+            .kite-img{
+                width:70vw;
+                top:18vh;
+                left:0 !important; 
+            }
+            .main-title{
+                right:3vw;
+                bottom:8vh;
+            }
+            .line-1{
+                top:48vh;
+                width:75vw;
+            }
+            .line-4{
+                top:40vh;
+                width:45vw;
+            }
+            .slide-tip-img{
+                width:15vw;
+            }
+            .music-icon{
+                width:28px;
+                height:28px;
+                top:20px;
+                right:20px;
+            }
+            .text-area{
+                right:5vw;
+                top:15vh;
+            }
+        }
+
+        @media screen and (min-width: 376px) and (max-width: 767px) {
+            .kite-img{
+                width:60vw;
+                top:15vh;
+                left:0 !important; 
+            }
+            .text-area{
+                right:8vw;
+                top:12vh;
+            }
+            .main-title{
+                right:6vw;
+                bottom:10vh;
+            }
+        }
+
+        @media screen and (min-width: 768px) {
+            .kite-img{
+                width:55vw;
+                max-width: 500px;
+                top:12vh;
+                left:0 !important; 
+            }
+            .text-area{
+                right:15vw;
+                top:10vh;
+            }
+            .main-title{
+                right:12vw;
+                bottom:15vh;
+            }
+            .slide-tip-img{
+                width:12vw;
+                max-width: 80px;
+            }
+            .music-icon{
+                width:40px;
+                height:40px;
+                top:30px;
+                right:30px;
+            }
+            .bg-circle{
+                top:-8vw;
+                right:8vw;
+                width:60vw;
+                max-width: 450px;
+            }
+        }
+
+        @media screen and (min-width: 1024px) {
+            .kite-img{
+                width:45vw;
+                max-width: 550px;
+                top:10vh;
+                left:0 !important; 
+            }
+            .text-area{
+                right:20vw;
+                top:8vh;
+            }
+            .main-title{
+                right:18vw;
+                bottom:18vh;
+            }
+            .line-1{
+                top:45vh;
+                width:70vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-home" id="pageHome">
+        <!-- 核心修改1：新增audio标签，加入autoplay/playsinline，双格式源 -->
+        <audio id="bgMusic" loop preload="metadata" autoplay playsinline>
+            <source src="music.m4a" type="audio/mp4">
+            <source src="music.mp3" type="audio/mpeg">
+        </audio>
+        
+        <div class="bg-circle"></div>
+        <div class="line-1"></div>
+        <div class="line-2"></div>
+        <div class="line-3"></div>
+        <div class="line-4"></div>
+        <img src="封面/资源 7@0.5x.webp" alt="潍坊风筝" class="kite-img">
+        <div class="text-area">
+            <img src="封面/资源 58@0.5x.webp" alt="文字区域" class="text-img">
+        </div>
+        <div class="main-title">
+            <img src="封面/资源 5@0.5x.webp" alt="鸢缘" class="yuan-with-pattern">
+            <div class="feiyi-tag"></div>
+        </div>
+        <div class="slide-tip">
+            <img src="封面/资源 16@0.5x.webp" alt="向上滑动" class="slide-tip-img">
+        </div>
+        <div class="music-icon" id="musicIcon"></div>
+    </div>
+
+    <script>
+        // 拦截所有触摸滑动事件，禁止默认行为
+        document.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }, { passive: false });
+
+        document.addEventListener('touchstart', function(e) {
+            e.stopPropagation();
+        }, { passive: true });
+
+        document.addEventListener('touchend', function(e) {
+            e.stopPropagation();
+        }, { passive: true });
+
+        let startY=0;
+        document.addEventListener('touchstart',(e)=>{
+            startY=e.touches[0].clientY;
+        }, { passive: true });
+
+        document.addEventListener('touchend',(e)=>{
+            const endY=e.changedTouches[0].clientY;
+            if(startY-endY>80){
+                saveMusicState(); // 切换前强制保存状态
+                setTimeout(()=>{
+                    window.location.href="page2-3.html";
+                }, 100);
+            }
+        });
+
+        // ========== 音乐逻辑（重构版：应用自动续播核心逻辑） ==========
+        const musicIcon = document.getElementById('musicIcon');
+        const bgMusic = document.getElementById('bgMusic'); // 核心修改2：改用DOM中的audio标签
+        let isPlaying = localStorage.getItem('musicPlaying') === 'true' || false;
+        const savedTime = parseFloat(localStorage.getItem('musicTime') || 0);
+        // 初始化交互标记（避免首次无标记）
+        if (!localStorage.getItem('musicHasInteraction')) {
+            localStorage.setItem('musicHasInteraction', 'false');
+        }
+        const hasInteraction = localStorage.getItem('musicHasInteraction') === 'true';
+        let progressTimer = null;
+
+        // 保存音乐状态（增强版：确保数值格式正确）
+        function saveMusicState() {
+            localStorage.setItem('musicPlaying', String(isPlaying));
+            localStorage.setItem('musicTime', String(Math.max(0, bgMusic.currentTime))); // 防止负数
+            localStorage.setItem('musicHasInteraction', 'true');
+        }
+
+        // 实时保存进度（和其他页面统一为100ms，保证进度同步）
+        function startProgressTimer() {
+            if (progressTimer) clearInterval(progressTimer);
+            progressTimer = setInterval(() => {
+                if (bgMusic.currentTime > 0 && !bgMusic.paused) {
+                    saveMusicState();
+                }
+            }, 100);
+        }
+
+        // 核心修改3：新增initAudio，加入muted+play兜底逻辑
+        function initAudio() {
+            // 恢复播放进度
+            if (!isNaN(savedTime) && savedTime > 0 && savedTime < (bgMusic.duration || 10000)) {
+                bgMusic.currentTime = savedTime;
+                console.log("首页恢复音乐进度：", savedTime);
+            }
+            
+            // 强制标记播放状态为true（首次进入默认播放）
+            if (!isPlaying) {
+                isPlaying = true;
+            }
+            musicIcon.classList.add('active');
+            
+            // 静音兜底：绕过浏览器自动播放限制
+            bgMusic.muted = true;
+            bgMusic.play().then(() => {
+                bgMusic.muted = false;
+                console.log("首页音频强制激活成功");
+            }).catch(err => {
+                console.log("首页音频激活兜底:", err);
+                // 重试逻辑，提升成功率
+                setTimeout(() => {
+                    bgMusic.play();
+                }, 100);
+            });
+
+            startProgressTimer();
+            localStorage.setItem('musicHasInteraction', 'true'); // 标记已交互
+        }
+
+        // 恢复音乐状态（兼容已有交互的情况）
+        function restoreMusicState() {
+            // 音频已加载完成且有交互记录，直接激活
+            if (bgMusic.readyState >= 2 && hasInteraction) {
+                initAudio();
+            }
+        }
+
+        // 切换音乐播放/暂停（增加状态校验）
+        function toggleMusic(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            
+            try {
+                if (isPlaying) {
+                    bgMusic.pause();
+                    musicIcon.classList.remove('active');
+                } else {
+                    bgMusic.play();
+                    musicIcon.classList.add('active');
+                    localStorage.setItem('musicHasInteraction', 'true');
+                }
+                isPlaying = !isPlaying;
+                saveMusicState();
+            } catch (err) {
+                console.error("音乐播放失败：", err);
+                alert("音频播放失败，请检查音频文件路径");
+            }
+        }
+
+        // ========== 页面生命周期优化 ==========
+        // 核心修改4：全局一次性交互监听，任意触摸/点击激活音频
+        document.addEventListener('touchstart', () => {
+            initAudio();
+        }, { once: true });
+        document.addEventListener('click', () => {
+            initAudio();
+        }, { once: true });
+
+        // 页面加载后尝试恢复状态
+        window.addEventListener('DOMContentLoaded', restoreMusicState); 
+        // 音乐按钮点击事件（修复事件绑定方式）
+        musicIcon.addEventListener('touchstart', toggleMusic, { passive: false });
+        musicIcon.addEventListener('click', toggleMusic);
+        
+        // 页面隐藏/显示时同步状态（适配切后台/前台）
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && isPlaying) {
+                bgMusic.pause();
+                isPlaying = false;
+                musicIcon.classList.remove('active');
+                saveMusicState();
+            } else if (!document.hidden && localStorage.getItem('musicPlaying') === 'true') {
+                // 切回前台时尝试续播（带静音兜底）
+                bgMusic.muted = true;
+                bgMusic.play().then(() => {
+                    bgMusic.muted = false;
+                    isPlaying = true;
+                    musicIcon.classList.add('active');
+                }).catch(err => console.log("切回前台续播失败：", err));
+            }
+        });
+
+        // 页面卸载前强制保存状态
+        window.addEventListener('beforeunload', () => {
+            saveMusicState();
+            clearInterval(progressTimer);
+            bgMusic.pause(); // 防止音频残留
+        });
+
+        // 禁止鼠标滚轮滚动
+        document.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }, { passive: false });
+    </script>
+</body>
+</html>

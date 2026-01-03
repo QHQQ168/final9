@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>潍坊风筝介绍</title>
+    <style>
+        /* 原有样式完全保留，无修改 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+            user-select: none;
+        }
+
+        html {
+            font-size: calc(100vw / 7.5);
+            max-font-size: 100px;
+            min-font-size: 20px;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            font-family: "Noto Sans SC Regular", sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            padding: 0.2rem 0.3rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .bgimg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .page-title {
+            font-size: clamp(0.5rem, 5vw, 0.50rem);
+            color: #333;
+            margin: 0;
+            text-align: left;
+            position: absolute;
+            top: 4vh;
+            left: 0.6rem;
+            z-index: 5;
+        }
+
+        .sub-title {
+            font-size: clamp(0.15rem, 3vw, 0.19rem);
+            color: #666;
+            line-height: 0.35rem;
+            text-align: left;
+            max-width: 85%;
+            position: absolute;
+            top: 10vh;
+            left: 0.6rem;
+            z-index: 5;
+        }
+
+        .kite-container {
+            position: relative;
+            width: 85%;
+            margin: 20vh auto 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 50vh;
+        }
+
+        .kite-img-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+
+        .kite-bg-img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            width: 100%;
+            height: 100%;
+            max-width: 130%;
+            max-height: 130%;
+            object-fit: contain;
+            object-position: center;
+            z-index: 1;
+            opacity: 0.9;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .kite-img {
+            position: relative;
+            max-width: 75%;
+            max-height: 75%;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            object-fit: contain;
+            object-position: center;
+            z-index: 2;
+            margin-top: 0;
+            transform: translateY(-1vh);
+            will-change: transform;
+            transform-origin: center center;
+            animation: float 3.5s linear infinite;
+        }
+
+        .kite-img:active {
+            transform: translateY(-1vh) scale(0.98);
+        }
+
+        .kite-name {
+            display: block;
+            position: absolute;
+            bottom: 6.5vh;
+            font-size: 0.38rem;
+            color: #333;
+            z-index: 3;
+            transition: opacity 0.3s ease;
+            font-weight: 500;
+        }
+
+        .arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0.5rem;
+            height: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            background-color: transparent;
+        }
+
+        .arrow-left {
+            left: -0.3rem;
+        }
+
+        .arrow-right {
+            right: -0.3rem;
+        }
+
+        .arrow img {
+            width: 0.3rem;
+            height: 0.5rem;
+        }
+
+        .hint-text {
+            font-size: clamp(0.15rem, 3vw, 0.17rem);
+            color: #333;
+            margin: 1vh 0 2vh 0;
+            text-align: center;
+            font-weight: 400;
+        }
+
+        .start-btn {
+            width: 35%;
+            height: auto;
+            margin: 2vh auto 8vh;
+            cursor: pointer;
+            display: block;
+            text-decoration: none;
+        }
+
+        .start-btn img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .start-btn:active {
+            opacity: 0.9;
+        }
+
+        .music-icon {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 32px;
+            height: 32px;
+            background-image: url("封面/资源 24@0.5x.webp");
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            background-position: center;
+            cursor: pointer;
+            z-index: 999;
+            transition: transform 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .music-icon.active {
+            animation: rotateMusic 3s linear infinite;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+        @keyframes rotateMusic {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="images/2/background.jpg" class="bgimg" alt="背景图">
+        
+        <!-- 音乐按钮和音频 -->
+        <div class="music-icon" id="musicBtn"></div>
+        <!-- 核心修改1：音频标签增加autoplay/playsinline，双格式源 -->
+        <audio id="bgMusic" loop preload="metadata" autoplay playsinline>
+            <source src="music.m4a" type="audio/mp4">
+            <source src="music.mp3" type="audio/mpeg">
+        </audio>
+
+        <h1 class="page-title">潍坊风筝介绍</h1>
+        <p class="sub-title">
+            潍坊，被誉为"世界风筝之都"<br>
+            于2006年被列入国家级非物质文化遗产名录
+        </p>
+
+        <div class="kite-container">
+            <div class="arrow arrow-left" onclick="changeKite(-1)">
+                <img src="images/2/资源 12(1)@0.5x.png" alt="上一个">
+            </div>
+            
+            <div class="kite-img-wrapper">
+                <img src="" class="kite-bg-img" alt="风筝背景" id="kiteBgImg">
+                <div class="kite-name" id="kiteName">板子风筝</div>
+                <img src="" class="kite-img" id="kiteImg" onclick="replaceKiteImg()">
+            </div>
+            
+            <div class="arrow arrow-right" onclick="changeKite(1)">
+                <img src="images/2/资源 12(2)@0.5x.png" alt="下一个">
+            </div>
+        </div>
+
+        <p class="hint-text">点击图片了解详情</p>
+
+        <a href="page4.html" class="start-btn" onclick="saveMusicState()">
+            <img src="images/2/资源 10@0.5x.webp" alt="开始制作">
+        </a>
+    </div>
+
+    <script>
+        // ========== 原有风筝逻辑（完全保留） ==========
+        const KITE_DATA = [
+            {
+                name: "板子风筝",
+                img: "images/2/板子.png",
+                detailImg: "images/2/资源板子.png",
+                bgImg: "images/2/资源 70@0.5x.webp",
+                detailBgImg: "images/2/资源 71@0.5x.webp"
+            },
+            {
+                name: "串形风筝",
+                img: "images/2/串形.png",
+                detailImg: "images/2/资源串形.png",
+                bgImg: "images/2/资源 70@0.5x.webp",
+                detailBgImg: "images/2/资源 71@0.5x.webp"
+            },
+            {
+                name: "桶形风筝",
+                img: "images/2/桶形.png",
+                detailImg: "images/2/资源桶形.png",
+                bgImg: "images/2/资源 70@0.5x.webp",
+                detailBgImg: "images/2/资源 71@0.5x.webp"
+            },
+            {
+                name: "硬翅风筝",
+                img: "images/2/硬翅.png",
+                detailImg: "images/2/资源硬翅.png",
+                bgImg: "images/2/资源 70@0.5x.webp",
+                detailBgImg: "images/2/资源 71@0.5x.webp"
+            },
+            {
+                name: "软翅风筝",
+                img: "images/2/软翅.png",
+                detailImg: "images/2/资源软翅.png",
+                bgImg: "images/2/资源 70@0.5x.webp",
+                detailBgImg: "images/2/资源 71@0.5x.webp"
+            },
+            {
+                name: "自由风筝",
+                img: "images/2/自由.png",
+                detailImg: "images/2/资源自由.png",
+                bgImg: "images/2/资源 70@0.5x.webp",
+                detailBgImg: "images/2/资源 71@0.5x.webp"
+            }
+        ];
+
+        let currentIndex = 0;
+        let isDetailShow = false;
+
+        function preloadAllImages() {
+            KITE_DATA.forEach(kite => {
+                [kite.bgImg, kite.detailBgImg, kite.img, kite.detailImg].forEach(src => {
+                    const img = new Image();
+                    img.src = src;
+                });
+            });
+        }
+
+        function changeKite(direction) {
+            currentIndex = (currentIndex + direction + KITE_DATA.length) % KITE_DATA.length;
+            isDetailShow = false;
+            updateKiteDisplay();
+        }
+
+        function updateKiteDisplay() {
+            const currentKite = KITE_DATA[currentIndex];
+            kiteName.innerText = currentKite.name;
+            kiteName.style.display = "block";
+            
+            kiteImg.style.maxWidth = "75%";
+            kiteImg.style.maxHeight = "75%";
+            kiteImg.style.animation = "float 3.5s linear infinite";
+            
+            kiteImg.style.opacity = '0';
+            
+            setTimeout(() => {
+                kiteBgImg.src = currentKite.bgImg;
+                kiteImg.src = currentKite.img;
+                
+                kiteImg.style.opacity = '1';
+                kiteBgImg.style.opacity = 0.85;
+            }, 150);
+        }
+
+        function replaceKiteImg() {
+            const currentKite = KITE_DATA[currentIndex];
+            kiteImg.style.opacity = 0;
+
+            setTimeout(() => {
+                isDetailShow = !isDetailShow;
+                
+                kiteImg.src = isDetailShow ? currentKite.detailImg : currentKite.img;
+                kiteBgImg.src = isDetailShow ? currentKite.detailBgImg : currentKite.bgImg;
+                kiteName.style.display = isDetailShow ? "none" : "block";
+                
+                if (isDetailShow) {
+                    kiteImg.style.maxWidth = "100%";
+                    kiteImg.style.maxHeight = "100%";
+                    kiteImg.style.animation = "none";
+                } else {
+                    kiteImg.style.maxWidth = "75%";
+                    kiteImg.style.maxHeight = "75%";
+                    kiteImg.style.animation = "float 3.5s linear infinite";
+                }
+
+                kiteImg.style.opacity = 1;
+                kiteBgImg.style.opacity = 0.85;
+            }, 250);
+        }
+
+        // ========== 音乐逻辑重构（核心修改部分） ==========
+        const musicBtn = document.getElementById("musicBtn");
+        const bgMusic = document.getElementById("bgMusic");
+        let isMusicPlaying = localStorage.getItem('musicPlaying') === 'true' || false;
+        const savedTime = parseFloat(localStorage.getItem('musicTime') || 0);
+        // 初始化交互标记
+        if (!localStorage.getItem('musicHasInteraction')) {
+            localStorage.setItem('musicHasInteraction', 'false');
+        }
+        const hasInteraction = localStorage.getItem('musicHasInteraction') === 'true';
+        let progressTimer = null;
+
+        // 保存音乐状态到本地存储
+        function saveMusicState() {
+            localStorage.setItem('musicPlaying', isMusicPlaying ? 'true' : 'false');
+            localStorage.setItem('musicTime', bgMusic.currentTime.toString());
+            localStorage.setItem('musicHasInteraction', 'true');
+        }
+
+        // 实时保存播放进度（和首页统一为100ms）
+        function startProgressTimer() {
+            if (progressTimer) clearInterval(progressTimer);
+            progressTimer = setInterval(() => {
+                if (bgMusic.currentTime > 0 && !bgMusic.paused) {
+                    saveMusicState();
+                }
+            }, 100);
+        }
+
+        // 核心修改2：新增initAudio，加入muted+play兜底逻辑
+        function initAudio() {
+            // 恢复播放进度
+            if (!isNaN(savedTime) && savedTime > 0 && savedTime < (bgMusic.duration || 10000)) {
+                bgMusic.currentTime = savedTime;
+                console.log("介绍页恢复音乐进度：", savedTime);
+            }
+            
+            // 强制保持播放状态（和首页一致）
+            if (!isMusicPlaying) {
+                isMusicPlaying = true;
+            }
+            musicBtn.classList.add('active');
+            
+            // 静音兜底：绕过浏览器自动播放限制
+            bgMusic.muted = true;
+            bgMusic.play().then(() => {
+                bgMusic.muted = false;
+                console.log("介绍页音频强制激活成功");
+            }).catch(err => {
+                console.log("介绍页音频激活兜底:", err);
+                // 重试逻辑
+                setTimeout(() => {
+                    bgMusic.play();
+                }, 100);
+            });
+
+            startProgressTimer();
+            localStorage.setItem('musicHasInteraction', 'true');
+        }
+
+        // 精准恢复音乐进度和播放状态
+        function restoreMusicState() {
+            // 音频已加载完成且有交互记录，直接激活
+            if (bgMusic.readyState >= 2 && hasInteraction) {
+                initAudio();
+            }
+        }
+
+        // 切换音乐播放/暂停（优化事件拦截）
+        function toggleMusic(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            
+            try {
+                if (isMusicPlaying) {
+                    bgMusic.pause();
+                    musicBtn.classList.remove('active');
+                } else {
+                    bgMusic.play();
+                    musicBtn.classList.add('active');
+                    localStorage.setItem('musicHasInteraction', 'true');
+                }
+                isMusicPlaying = !isMusicPlaying;
+                saveMusicState();
+            } catch (err) {
+                console.error("音乐切换失败：", err);
+                alert("音频播放失败，请检查文件路径");
+            }
+        }
+
+        // ========== 初始化 ==========
+        // 核心修改3：全局一次性交互监听，任意触摸/点击激活音频
+        document.addEventListener('touchstart', () => {
+            initAudio();
+        }, { once: true });
+        document.addEventListener('click', () => {
+            initAudio();
+        }, { once: true });
+
+        // 音乐按钮点击事件（修复事件绑定）
+        musicBtn.addEventListener('touchstart', toggleMusic, { passive: false });
+        musicBtn.addEventListener('click', toggleMusic);
+        
+        // 页面加载后恢复音乐状态
+        window.addEventListener('load', restoreMusicState);
+        
+        // 页面隐藏/显示时同步状态
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && isMusicPlaying) {
+                bgMusic.pause();
+                isMusicPlaying = false;
+                musicBtn.classList.remove('active');
+                saveMusicState();
+            } else if (!document.hidden && localStorage.getItem('musicPlaying') === 'true') {
+                // 切回前台时带静音兜底续播
+                bgMusic.muted = true;
+                bgMusic.play().then(() => {
+                    bgMusic.muted = false;
+                    isMusicPlaying = true;
+                    musicBtn.classList.add('active');
+                }).catch(err => console.log("介绍页切回前台续播失败：", err));
+            }
+        });
+        
+        // 页面离开时保存状态
+        window.addEventListener('beforeunload', () => {
+            saveMusicState();
+            clearInterval(progressTimer);
+            bgMusic.pause();
+        });
+
+        // 风筝初始化
+        function initKite() {
+            preloadAllImages();
+            const firstKite = KITE_DATA[0];
+            kiteName.innerText = firstKite.name;
+            kiteBgImg.src = firstKite.bgImg;
+            
+            kiteImg.style.maxWidth = "75%";
+            kiteImg.style.maxHeight = "75%";
+            kiteImg.style.animation = "float 3.5s linear infinite";
+            kiteImg.style.opacity = 0;
+            
+            setTimeout(() => {
+                kiteImg.src = firstKite.img;
+                kiteImg.style.opacity = 1;
+            }, 200);
+        }
+
+        initKite();
+    </script>
+</body>
+</html>
